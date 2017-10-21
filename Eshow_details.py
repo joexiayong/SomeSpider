@@ -6,6 +6,9 @@ sTime = time.clock()
 db1 = pymysql.connect('localhost','root','3525','learn')
 db2 = pymysql.connect('localhost','root','3525','learn')
 
+fdb = 0
+cnt = 0
+
 cursor1 = db1.cursor()
 cursor2 = db2.cursor()
 
@@ -18,12 +21,17 @@ for result in cursor1:
     soup = BeautifulSoup(r.text,'html.parser')
     try:
         title=soup.find('h1').string.strip()
-    except:
+    except :
         title=''
         continue
     l= soup('div',class_='zhxxcontent')
     pTag = l[0].find_all('p')
-    dateTime = pTag[2].string.strip()[5:]
+    try:
+        dateTime = pTag[2].string.strip()[5:]
+    except:
+        deteTime =''
+        continue
+        
     if pTag[3].string :
         hall = pTag[3].string.strip()[5:].replace('\xa0','')
     else:
@@ -51,14 +59,21 @@ for result in cursor1:
         except:
             continue   
         ran = ran.replace('\n','').replace('\xa0','')
-    cursor2.execute("insert into details(dateTime,hall,industry,city,\
-        introduce,ran) values\
-        ('%s','%s','%s','%s','%s','%s');" %(dateTime,hall,industry,\
-        city,introduce,ran)
-)
+    try :
+        cursor2.execute("insert into details(title,dateTime,hall,industry,city,\
+            introduce,ran) values\
+            ('%s','%s','%s','%s','%s','%s','%s');" %(title, dateTime,hall,industry,\
+            city,introduce,ran)
+    )
+    except:
+        fdb +=1
+        continue
     db2.commit()
+    cnt+=1
+    print(cnt,':',title)
 db1.close()
 db2.close()
 eTime= time.clock()
 
 print('程序耗时'+str(eTime-sTime)+'秒')
+print(fdb)

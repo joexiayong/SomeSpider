@@ -8,3 +8,5 @@ this is a git repository.
 	2.Mysql的默认编码问题
 	在linux中 修改/etc/mysql中的配置文件
 	查看编码：show variables like 'character%';	
+	
+github 代码合并：git pull --rebase origin master
